@@ -4,12 +4,11 @@ import (
 	"github.com/lielalmog/go-be-eight-puzzle-solver/errors/apperrors"
 )
 
-const BoardBlackValue = -1
-
 type Board struct {
-	rowCount    int
-	columnCount int
-	tiles       [][]int
+	rowCount          int
+	columnCount       int
+	tiles             [][]int
+	blankTilePosition Position
 }
 
 func NewBoard(rowCount, columnCount int) (*Board, error) {
@@ -21,10 +20,75 @@ func NewBoard(rowCount, columnCount int) (*Board, error) {
 		return nil, apperrors.ErrColumnCountSmallerThanOne
 	}
 
+	// Initliaze array of arrays
+	tiles := make([][]int, rowCount)
+
+	var shufflesArr []int = createRandomArray(columnCount * rowCount)
+
+	// Initliaze each inner array
+	for i := 0; i < rowCount; i++ {
+		tiles[i] = make([]int, columnCount)
+	}
+
+	var blankTilePosition Position
+
+	for i := 0; i < rowCount; i++ {
+		for j := 0; j < columnCount; j++ {
+			index := i*columnCount + j
+			randomValue := shufflesArr[index]
+
+			// If this is the blank tile set this value in the struct
+			if randomValue == BoardBlankValue {
+				blankTilePosition = Position{
+					row:    i,
+					column: j,
+				}
+			}
+
+			tiles[i][j] = randomValue
+		}
+	}
+
 	board := &Board{
-		rowCount:    rowCount,
-		columnCount: columnCount,
+		rowCount:          rowCount,
+		columnCount:       columnCount,
+		tiles:             tiles,
+		blankTilePosition: blankTilePosition,
 	}
 
 	return board, nil
+}
+
+func (b *Board) IsValid() bool {
+	var s map[int]bool = make(map[int]bool)
+
+	for i := 0; i < b.rowCount; i++ {
+		for j := 0; j < b.columnCount; j++ {
+			v := b.tiles[i][j]
+			s[v] = true
+		}
+	}
+
+	return len(s) == b.columnCount*b.rowCount
+}
+
+func (b *Board) inversionCount() int {
+	arr := convertTo1D(b.tiles)
+	return countInversions(arr)
+}
+
+func (b *Board) IsSolvable() bool {
+	invCount := b.inversionCount()
+
+	if isOdd(b.columnCount) {
+		return isEven(invCount)
+	} else {
+		blankRowFromBottom := b.rowCount - b.blankTilePosition.row
+
+		if isEven(blankRowFromBottom) {
+			return isOdd(invCount)
+		} else {
+			return isEven(invCount)
+		}
+	}
 }
