@@ -9,6 +9,7 @@ type Board struct {
 	columnCount       int
 	tiles             [][]int
 	blankTilePosition Position
+	targetBoard       [][]int
 }
 
 func NewBoard(rowCount, columnCount int) (*Board, error) {
@@ -91,4 +92,30 @@ func (b *Board) IsSolvable() bool {
 			return isEven(invCount)
 		}
 	}
+}
+
+func (b *Board) IsSolved() bool {
+	targetArr := generateTargetBoard(b.rowCount, b.columnCount)
+
+	currArr := convertTo1D(b.tiles)
+
+	if len(currArr) != len(targetArr) {
+		return false
+	}
+
+	for i := 0; i < len(currArr); i++ {
+		if currArr[i] != targetArr[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (b *Board) canMove() bool {
+	return false
+}
+
+func (b *Board) move() {
+
 }

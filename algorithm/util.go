@@ -55,3 +55,14 @@ func isOdd(n int) bool {
 func isEven(n int) bool {
 	return n%2 == 0
 }
+
+func generateTargetBoard(rowCount, columnCount int) []int {
+	arr := make([]int, rowCount*columnCount)
+	arr[0] = BoardBlankValue
+
+	for i := 1; i < rowCount*columnCount; i++ {
+		arr[i] = i
+	}
+
+	return arr
+}
