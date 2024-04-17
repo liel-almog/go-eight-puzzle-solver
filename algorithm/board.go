@@ -1,6 +1,8 @@
 package algorithm
 
 import (
+	"fmt"
+
 	"github.com/lielalmog/go-be-eight-puzzle-solver/errors/apperrors"
 )
 
@@ -9,7 +11,6 @@ type Board struct {
 	columnCount       int
 	tiles             [][]int
 	blankTilePosition Position
-	targetBoard       [][]int
 }
 
 func NewBoard(rowCount, columnCount int) (*Board, error) {
@@ -94,9 +95,7 @@ func (b *Board) IsSolvable() bool {
 	}
 }
 
-func (b *Board) IsSolved() bool {
-	targetArr := generateTargetBoard(b.rowCount, b.columnCount)
-
+func (b *Board) IsSolved(targetArr []int) bool {
 	currArr := convertTo1D(b.tiles)
 
 	if len(currArr) != len(targetArr) {
@@ -112,10 +111,28 @@ func (b *Board) IsSolved() bool {
 	return true
 }
 
-func (b *Board) canMove() bool {
-	return false
+func (b *Board) isOutOfBounds(pos Position) bool {
+	return (pos.column < 0 || pos.column >= b.columnCount) || (pos.row < 0 || pos.row >= b.rowCount)
 }
 
-func (b *Board) move() {
+func (b *Board) move(move MoveDirection) error {
+	fmt.Println(b.tiles)
+	newPos := Position{
+		row:    b.blankTilePosition.row + move.rowChange,
+		column: b.blankTilePosition.column + move.columnChange,
+	}
 
+	if b.isOutOfBounds(newPos) {
+		return apperrors.ErrInvalidMove
+	}
+
+	v := b.tiles[newPos.row][newPos.column]
+
+	b.tiles[newPos.row][newPos.column] = BoardBlankValue
+	b.tiles[b.blankTilePosition.row][b.blankTilePosition.column] = v
+
+	b.blankTilePosition = newPos
+	fmt.Println(b.tiles)
+
+	return nil
 }
