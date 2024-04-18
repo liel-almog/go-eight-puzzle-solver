@@ -1,16 +1,27 @@
 package algorithm
 
 import (
-	"fmt"
-
 	"github.com/lielalmog/go-be-eight-puzzle-solver/errors/apperrors"
 )
 
 type Board struct {
 	rowCount          int
-	columnCount       int
+	columnCount       int `copier:"-"`
 	tiles             [][]int
 	blankTilePosition Position
+}
+
+func NewBoardFromBoard(b *Board) *Board {
+	var newB Board = *b
+
+	copyTiles := make([][]int, len(b.tiles))
+	for i := range b.tiles {
+		copyTiles[i] = make([]int, len(b.tiles[i]))
+		copy(copyTiles[i], b.tiles[i])
+	}
+
+	newB.tiles = copyTiles
+	return &newB
 }
 
 func NewBoard(rowCount, columnCount int) (*Board, error) {
@@ -116,7 +127,6 @@ func (b *Board) isOutOfBounds(pos Position) bool {
 }
 
 func (b *Board) move(move MoveDirection) error {
-	fmt.Println(b.tiles)
 	newPos := Position{
 		row:    b.blankTilePosition.row + move.rowChange,
 		column: b.blankTilePosition.column + move.columnChange,
@@ -132,7 +142,6 @@ func (b *Board) move(move MoveDirection) error {
 	b.tiles[b.blankTilePosition.row][b.blankTilePosition.column] = v
 
 	b.blankTilePosition = newPos
-	fmt.Println(b.tiles)
 
 	return nil
 }
