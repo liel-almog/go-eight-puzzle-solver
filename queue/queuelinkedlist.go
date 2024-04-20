@@ -1,21 +1,25 @@
 package queue
 
-// Node will store the value and the next node as well
-type Node[T any] struct {
+// node will store the value and the next node as well
+type node[T any] struct {
 	Data T
-	Next *Node[T]
+	Next *node[T]
 }
 
 // LinkedListQueue structure tells us what our head is, what tail should be, and the length of the list
 type LinkedListQueue[T any] struct {
-	head   *Node[T]
-	tail   *Node[T]
+	head   *node[T]
+	tail   *node[T]
 	length int
+}
+
+func NewLinkedListQueue[T any]() Queue[T] {
+	return &LinkedListQueue[T]{}
 }
 
 // Enqueue will add a new value into the queue
 func (q *LinkedListQueue[T]) Enqueue(n T) error {
-	newNode := &Node[T]{Data: n, Next: nil} // create and initialize new Node
+	newNode := &node[T]{Data: n, Next: nil} // create and initialize new Node
 
 	if q.tail != nil {
 		q.tail.Next = newNode
@@ -75,8 +79,4 @@ func (q *LinkedListQueue[T]) BackQueue() (T, error) {
 		return empty, ErrQueueEmpty // return zero value and false if empty
 	}
 	return q.tail.Data, nil
-}
-
-func NewLinkedListQueue[T any]() Queue[T] {
-	return &LinkedListQueue[T]{}
 }
