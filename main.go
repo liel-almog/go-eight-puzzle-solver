@@ -1,41 +1,36 @@
 package main
 
 import (
-	"github.com/lielalmog/go-be-eight-puzzle-solver/algorithm"
+	"context"
+	"log"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/lielalmog/go-be-eight-puzzle-solver/server"
 )
 
 func main() {
-	b, err := algorithm.NewBoard(4, 3)
-	if err != nil {
-		panic("asd")
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	// We initialize the database at the beginning of our program
+	go server.Serve()
+
+	// Listen for the interrupt signal.
+	<-ctx.Done()
+
+	// Restore default behavior on the interrupt signal and notify user of shutdown.
+	stop()
+	log.Println("shutting down gracefully, press Ctrl+C again to force")
+
+	// The context is used to inform the server it has 5 seconds to finish
+	// the request it is currently handling
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown: ", err)
 	}
 
-	bSolver := algorithm.BfsSolver{
-		InitialBaord: b,
-	}
-
-	bSolver.Solve()
-
-	// ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	// defer stop()
-
-	// // We initialize the database at the beginning of our program
-	// go server.Serve()
-
-	// // Listen for the interrupt signal.
-	// <-ctx.Done()
-
-	// // Restore default behavior on the interrupt signal and notify user of shutdown.
-	// stop()
-	// log.Println("shutting down gracefully, press Ctrl+C again to force")
-
-	// // The context is used to inform the server it has 5 seconds to finish
-	// // the request it is currently handling
-	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	// defer cancel()
-	// if err := server.Shutdown(ctx); err != nil {
-	// 	log.Fatal("Server forced to shutdown: ", err)
-	// }
-
-	// log.Println("Server exiting")
+	log.Println("Server exiting")
 }

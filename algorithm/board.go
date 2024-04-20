@@ -6,8 +6,8 @@ import (
 
 type Board struct {
 	rowCount          int
-	columnCount       int `copier:"-"`
-	tiles             [][]int
+	columnCount       int
+	tiles             Tiles
 	blankTilePosition Position
 }
 
@@ -87,6 +87,11 @@ func (b *Board) IsValid() bool {
 
 func (b *Board) inversionCount() int {
 	arr := convertTo1D(b.tiles)
+
+	// Remove the blank tile
+	index := getBlankTileIndex(b)
+	arr = append(arr[:index], arr[index+1:]...)
+
 	return countInversions(arr)
 }
 
