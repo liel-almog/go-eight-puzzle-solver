@@ -54,3 +54,16 @@ func GenerateTargetBoard(rowCount, columnCount int) []int {
 func getBlankTileIndex(b *Board) int {
 	return b.blankTilePosition.row*b.columnCount + b.blankTilePosition.column
 }
+
+func cloneTiles(tiles Tiles) (Tiles, error) {
+	rowCount := len(tiles)
+
+	if rowCount < 1 {
+		return nil, ErrEmptyTiles
+	}
+	columnCount := len(tiles[0])
+
+	newTiles := make(Tiles, rowCount)
+
+	return newTiles, nil
+}
