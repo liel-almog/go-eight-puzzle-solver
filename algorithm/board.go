@@ -150,3 +150,17 @@ func (b *Board) move(move MoveDirection) error {
 
 	return nil
 }
+
+func (b *Board) GetTiles() Tiles {
+	var t Tiles = make(Tiles, b.rowCount)
+
+	for i := 0; i < b.rowCount; i++ {
+		t[i] = make([]int, b.columnCount)
+
+		for j := 0; j < b.columnCount; j++ {
+			t[i][j] = b.tiles[i][j]
+		}
+	}
+
+	return t
+}

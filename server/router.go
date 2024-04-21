@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/lielalmog/go-be-eight-puzzle-solver/routes"
 )
 
 func setupRouter(app *fiber.App) {
@@ -11,5 +12,6 @@ func setupRouter(app *fiber.App) {
 		})
 	})
 
-	// api := app.Group("/api")
+	api := app.Group("/api")
+	routes.NewPuzzleRouter(api)
 }
