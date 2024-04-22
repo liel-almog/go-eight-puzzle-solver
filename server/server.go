@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-const addr = ":8080"
+const addr = ":5000"
 
 var app *fiber.App
 

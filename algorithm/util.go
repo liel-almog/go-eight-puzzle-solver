@@ -18,22 +18,6 @@ func createRandomArray(size int) []int {
 	return arr
 }
 
-func convertTo2D(arr []int, rowCount, columnCount int) [][]int {
-	a := make([][]int, rowCount)
-
-	for i := range a {
-		a[i] = make([]int, columnCount)
-	}
-
-	for i := 0; i < rowCount; i++ {
-		for j := 0; j < columnCount; j++ {
-			a[i][j] = arr[i*columnCount+j]
-		}
-	}
-
-	return a
-}
-
 func convertTo1D(arr [][]int) []int {
 	rowCount := len(arr)
 	columnCount := len(arr[0])
@@ -56,7 +40,7 @@ func isEven(n int) bool {
 	return n%2 == 0
 }
 
-func generateTargetBoard(rowCount, columnCount int) []int {
+func GenerateTargetBoard(rowCount, columnCount int) []int {
 	arr := make([]int, rowCount*columnCount)
 	arr[0] = BoardBlankValue
 
@@ -65,4 +49,30 @@ func generateTargetBoard(rowCount, columnCount int) []int {
 	}
 
 	return arr
+}
+
+func getBlankTileIndex(b *Board) int {
+	return b.blankTilePosition.row*b.columnCount + b.blankTilePosition.column
+}
+
+func cloneTiles(tiles Tiles) (Tiles, error) {
+	rowCount := len(tiles)
+
+	if rowCount < 1 {
+		return nil, ErrEmptyTiles
+	}
+
+	columnCount := len(tiles[0])
+
+	newTiles := make(Tiles, rowCount)
+	for i := 0; i < rowCount; i++ {
+		newTiles[i] = make([]int, columnCount)
+		if len(tiles[i]) != columnCount {
+			return nil, ErrTilesNotSameSize
+		}
+
+		copy(newTiles[i], tiles[i])
+	}
+
+	return newTiles, nil
 }

@@ -1,21 +1,25 @@
 package queue
 
-// Node will store the value and the next node as well
-type Node[T any] struct {
+// node will store the value and the next node as well
+type node[T any] struct {
 	Data T
-	Next *Node[T]
+	Next *node[T]
 }
 
-// Queue structure tells us what our head is, what tail should be, and the length of the list
-type Queue[T any] struct {
-	head   *Node[T]
-	tail   *Node[T]
+// LinkedListQueue structure tells us what our head is, what tail should be, and the length of the list
+type LinkedListQueue[T any] struct {
+	head   *node[T]
+	tail   *node[T]
 	length int
 }
 
+func NewLinkedListQueue[T any]() Queue[T] {
+	return &LinkedListQueue[T]{}
+}
+
 // Enqueue will add a new value into the queue
-func (q *Queue[T]) Enqueue(n T) {
-	newNode := &Node[T]{Data: n} // create and initialize new Node
+func (q *LinkedListQueue[T]) Enqueue(n T) error {
+	newNode := &node[T]{Data: n, Next: nil} // create and initialize new Node
 
 	if q.tail != nil {
 		q.tail.Next = newNode
@@ -27,13 +31,15 @@ func (q *Queue[T]) Enqueue(n T) {
 		q.head = newNode
 	}
 	q.length++
+
+	return nil
 }
 
 // Dequeue will remove the first value from the queue (First In First Out)
-func (q *Queue[T]) Dequeue() (T, bool) {
+func (q *LinkedListQueue[T]) Dequeue() (T, error) {
 	if q.IsEmpty() {
-		var zeroVal T         // create a zero value for T
-		return zeroVal, false // if is empty return zero value and false
+		var empty T                 // create a zero value for T
+		return empty, ErrQueueEmpty // if is empty return zero value and false
 	}
 	data := q.head.Data
 
@@ -44,37 +50,33 @@ func (q *Queue[T]) Dequeue() (T, bool) {
 	}
 
 	q.length--
-	return data, true
+	return data, nil
 }
 
 // IsEmpty checks if our list is empty or not
-func (q *Queue[T]) IsEmpty() bool {
+func (q *LinkedListQueue[T]) IsEmpty() bool {
 	return q.length == 0
 }
 
 // Len returns the length of the queue
-func (q *Queue[T]) Len() int {
+func (q *LinkedListQueue[T]) Len() int {
 	return q.length
 }
 
 // FrontQueue returns the front data
-func (q *Queue[T]) FrontQueue() (T, bool) {
+func (q *LinkedListQueue[T]) FrontQueue() (T, error) {
 	if q.IsEmpty() {
-		var zeroVal T
-		return zeroVal, false // return zero value and false if empty
+		var empty T
+		return empty, ErrQueueEmpty // return zero value and false if empty
 	}
-	return q.head.Data, true
+	return q.head.Data, nil
 }
 
 // BackQueue returns the back data
-func (q *Queue[T]) BackQueue() (T, bool) {
+func (q *LinkedListQueue[T]) BackQueue() (T, error) {
 	if q.IsEmpty() {
-		var zeroVal T
-		return zeroVal, false // return zero value and false if empty
+		var empty T
+		return empty, ErrQueueEmpty // return zero value and false if empty
 	}
-	return q.tail.Data, true
-}
-
-func New[T any]() *Queue[T] {
-	return &Queue[T]{}
+	return q.tail.Data, nil
 }
