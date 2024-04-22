@@ -11,17 +11,46 @@ type Board struct {
 	blankTilePosition Position
 }
 
-func NewBoardFromBoard(b *Board) *Board {
+func NewBoardFromTiles(tiles Tiles) (*Board, error) {
+	var b Board
+
+	copyTiles, err := cloneTiles(tiles)
+	if err != nil {
+		return nil, err
+	}
+
+	b.tiles = copyTiles
+	b.rowCount = len(copyTiles)
+	b.columnCount = len(copyTiles[0])
+
+TilesLoop:
+	for i := 0; i < b.rowCount; i++ {
+		for j := 0; j < b.columnCount; j++ {
+			if b.tiles[i][j] == BoardBlankValue {
+				b.blankTilePosition = Position{
+					row:    i,
+					column: j,
+				}
+
+				// We break because we found where the blank tile is
+				break TilesLoop
+			}
+		}
+	}
+
+	return &b, nil
+}
+
+func NewBoardFromBoard(b *Board) (*Board, error) {
 	var newB Board = *b
 
-	copyTiles := make([][]int, len(b.tiles))
-	for i := range b.tiles {
-		copyTiles[i] = make([]int, len(b.tiles[i]))
-		copy(copyTiles[i], b.tiles[i])
+	copyTiles, err := cloneTiles(b.tiles)
+	if err != nil {
+		return nil, err
 	}
 
 	newB.tiles = copyTiles
-	return &newB
+	return &newB, nil
 }
 
 func NewBoard(rowCount, columnCount int) (*Board, error) {
@@ -163,4 +192,12 @@ func (b *Board) GetTiles() Tiles {
 	}
 
 	return t
+}
+
+func (b *Board) GetRowCount() int {
+	return b.rowCount
+}
+
+func (b *Board) GetColumnCount() int {
+	return b.columnCount
 }

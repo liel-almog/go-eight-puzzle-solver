@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"sync"
 
 	"github.com/lielalmog/go-be-eight-puzzle-solver/algorithm"
@@ -8,8 +9,8 @@ import (
 )
 
 type PuzzleService interface {
-	GeneratePuzzle(*dto.BoardDimensionsDTO) (algorithm.Tiles, error)
-	Solve(algorithm.Tiles) (algorithm.TilesArray, error)
+	GeneratePuzzle(context.Context, *dto.BoardDimensionsDTO) (algorithm.Tiles, error)
+	Solve(context.Context, algorithm.Tiles) (algorithm.TilesArray, error)
 }
 
 type puzzleServiceImpl struct{}
@@ -31,7 +32,7 @@ func GetPuzzleService() PuzzleService {
 	return puzzleService
 }
 
-func (p *puzzleServiceImpl) GeneratePuzzle(bDimensions *dto.BoardDimensionsDTO) (algorithm.Tiles, error) {
+func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto.BoardDimensionsDTO) (algorithm.Tiles, error) {
 	b, err := algorithm.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
 
 	if err != nil {
@@ -41,6 +42,40 @@ func (p *puzzleServiceImpl) GeneratePuzzle(bDimensions *dto.BoardDimensionsDTO) 
 	return b.GetTiles(), nil
 }
 
-func (p *puzzleServiceImpl) Solve(tiles algorithm.Tiles) (algorithm.TilesArray, error) {
-	return nil, nil
+func (p *puzzleServiceImpl) Solve(ctx context.Context, tiles algorithm.Tiles) (algorithm.TilesArray, error) {
+	type BfsResult struct {
+		solution algorithm.TilesArray
+		err      error
+	}
+
+	b, err := algorithm.NewBoardFromTiles(tiles)
+	if err != nil {
+		return nil, err
+	}
+
+	bSolver := algorithm.NewBfsSolver(b)
+	targetBoard := algorithm.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
+
+	ch := make(chan BfsResult)
+
+	go func() {
+		solution, err := bSolver.Solve(targetBoard)
+
+		ch <- BfsResult{
+			solution: solution,
+			err:      err,
+		}
+	}()
+
+	select {
+	case res := <-ch:
+		if res.err != nil {
+			return nil, err
+		}
+
+		return res.solution, nil
+
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
 }

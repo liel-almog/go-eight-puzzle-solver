@@ -61,9 +61,18 @@ func cloneTiles(tiles Tiles) (Tiles, error) {
 	if rowCount < 1 {
 		return nil, ErrEmptyTiles
 	}
+
 	columnCount := len(tiles[0])
 
 	newTiles := make(Tiles, rowCount)
+	for i := 0; i < rowCount; i++ {
+		newTiles[i] = make([]int, columnCount)
+		if len(tiles[i]) != columnCount {
+			return nil, ErrTilesNotSameSize
+		}
+
+		copy(newTiles[i], tiles[i])
+	}
 
 	return newTiles, nil
 }

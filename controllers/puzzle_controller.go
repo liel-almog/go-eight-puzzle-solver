@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
@@ -49,7 +48,7 @@ func (p *puzzleControllerImpl) GeneratePuzzle(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	tiles, err := p.puzzleService.GeneratePuzzle(bDimensions)
+	tiles, err := p.puzzleService.GeneratePuzzle(c.Context(), bDimensions)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
@@ -58,7 +57,7 @@ func (p *puzzleControllerImpl) GeneratePuzzle(c *fiber.Ctx) error {
 }
 
 func (p *puzzleControllerImpl) Solve(c *fiber.Ctx) error {
-	tiles := new(dto.TilesDto)
+	tiles := new(dto.TilesDTO)
 
 	if err := c.BodyParser(tiles); err != nil {
 		return fiber.ErrBadRequest
@@ -68,6 +67,10 @@ func (p *puzzleControllerImpl) Solve(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	fmt.Println(tiles)
-	return nil
+	solution, err := p.puzzleService.Solve(c.Context(), tiles.Tiles)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(solution)
 }

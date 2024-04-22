@@ -45,7 +45,10 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 			return nil, err
 		}
 
-		n := bSolver.neighbours(&b)
+		n, err := bSolver.neighbours(&b)
+		if err != nil {
+			return nil, err
+		}
 
 		for _, currBoard := range n {
 			currBoardKey := bSolver.arrayToString(currBoard.tiles)
@@ -66,20 +69,24 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 	return nil, ErrNoSolution
 }
 
-func (bSolver *BfsSolver) neighbours(b *Board) []Board {
+func (bSolver *BfsSolver) neighbours(b *Board) ([]Board, error) {
 	var adj []Board = make([]Board, 0, 4)
 
 	directions := GetDirections()
 	for i := 0; i < len(directions); i++ {
 		d := directions[i]
-		var newBoard Board = *NewBoardFromBoard(b)
+
+		newBoard, err := NewBoardFromBoard(b)
+		if err != nil {
+			return nil, err
+		}
 
 		if err := newBoard.move(d); err == nil {
-			adj = append(adj, newBoard)
+			adj = append(adj, *newBoard)
 		}
 	}
 
-	return adj
+	return adj, nil
 }
 
 func (bSolver *BfsSolver) reconstructPath(state string, stateMap map[string]string) [][][]int {
@@ -111,10 +118,12 @@ func (bSolver *BfsSolver) arrayToString(a [][]int) string {
 		if i > 0 {
 			builder.WriteString("|") // Use '|' as a row delimiter
 		}
+
 		for j, val := range row {
 			if j > 0 {
 				builder.WriteString(",") // Use ',' as a column delimiter
 			}
+
 			fmt.Fprintf(&builder, "%d", val)
 		}
 	}

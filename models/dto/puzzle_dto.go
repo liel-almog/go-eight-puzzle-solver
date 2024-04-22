@@ -5,6 +5,6 @@ type BoardDimensionsDTO struct {
 	ColumnCount int `json:"columnCount" validate:"required,min=2,max=8"`
 }
 
-type TilesDto struct {
+type TilesDTO struct {
 	Tiles [][]int `json:"tiles" validate:"required,min=2,dive,required,min=2"`
 }
