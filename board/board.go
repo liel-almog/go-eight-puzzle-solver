@@ -163,7 +163,7 @@ func (b *Board) isOutOfBounds(pos Position) bool {
 	return (pos.column < 0 || pos.column >= b.columnCount) || (pos.row < 0 || pos.row >= b.rowCount)
 }
 
-func (b *Board) Move(move MoveDirection) error {
+func (b *Board) move(move MoveDirection) error {
 	newPos := Position{
 		row:    b.blankTilePosition.row + move.rowChange,
 		column: b.blankTilePosition.column + move.columnChange,
@@ -181,6 +181,26 @@ func (b *Board) Move(move MoveDirection) error {
 	b.blankTilePosition = newPos
 
 	return nil
+}
+
+func (b *Board) Neighbours() ([]Board, error) {
+	var adj []Board = make([]Board, 0, 4)
+
+	directions := GetDirections()
+	for i := 0; i < len(directions); i++ {
+		d := directions[i]
+
+		newBoard, err := NewBoardFromBoard(b)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := newBoard.move(d); err == nil {
+			adj = append(adj, *newBoard)
+		}
+	}
+
+	return adj, nil
 }
 
 func (b *Board) GetTiles() Tiles {
