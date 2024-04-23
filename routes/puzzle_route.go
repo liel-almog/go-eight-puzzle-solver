@@ -1,16 +1,16 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/controllers"
 )
 
-func NewPuzzleRouter(router fiber.Router) {
+func NewPuzzleRouter(router *echo.Group) {
 	group := router.Group("/puzzle")
 
 	controller := controllers.GetPuzzleController()
-	group.Post("/generate", controller.GeneratePuzzle)
-	group.Post("/bfs/solve", controller.BfsSolve)
-	group.Post("/dfs/solve", controller.DfsSolve)
-	group.Post("/astar/solve", controller.AStarSolve)
+	group.POST("/generate", controller.GeneratePuzzle)
+	group.POST("/bfs/solve", controller.BfsSolve)
+	group.POST("/dfs/solve", controller.DfsSolve)
+	group.POST("/astar/solve", controller.AStarSolve)
 }

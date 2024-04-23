@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/lielalmog/go-be-eight-puzzle-solver/algorithm"
@@ -39,6 +38,10 @@ func GetPuzzleService() PuzzleService {
 func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto.BoardDimensionsDTO) (board.Tiles, error) {
 	b, err := board.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
 
+	for !b.IsSolvable() {
+		b, err = board.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -64,46 +67,7 @@ func (p *puzzleServiceImpl) BfsSolve(ctx context.Context, tiles board.Tiles) (bo
 
 	go func() {
 		solution, err := bSolver.Solve(targetBoard)
-
 		ch <- BfsResult{
-			solution: solution,
-			err:      err,
-		}
-	}()
-
-	select {
-	case res := <-ch:
-		if res.err != nil {
-			return nil, err
-		}
-
-		return res.solution, nil
-
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	}
-}
-
-func (p *puzzleServiceImpl) AStarSolve(ctx context.Context, tiles board.Tiles) (board.TilesArray, error) {
-	type AStarResult struct {
-		solution board.TilesArray
-		err      error
-	}
-
-	b, err := board.NewBoardFromTiles(tiles)
-	if err != nil {
-		return nil, err
-	}
-
-	bSolver := algorithm.NewBfsSolver(b)
-	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
-
-	ch := make(chan AStarResult)
-
-	go func() {
-		solution, err := bSolver.Solve(targetBoard)
-
-		ch <- AStarResult{
 			solution: solution,
 			err:      err,
 		}
@@ -156,8 +120,44 @@ func (p *puzzleServiceImpl) DfsSolve(ctx context.Context, tiles board.Tiles) (bo
 		return res.solution, nil
 
 	case <-ctx.Done():
-		fmt.Println("H")
+		return nil, ctx.Err()
+	}
+}
 
+func (p *puzzleServiceImpl) AStarSolve(ctx context.Context, tiles board.Tiles) (board.TilesArray, error) {
+	type AStarResult struct {
+		solution board.TilesArray
+		err      error
+	}
+
+	b, err := board.NewBoardFromTiles(tiles)
+	if err != nil {
+		return nil, err
+	}
+
+	bSolver := algorithm.NewBfsSolver(b)
+	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
+
+	ch := make(chan AStarResult)
+
+	go func() {
+		solution, err := bSolver.Solve(targetBoard)
+
+		ch <- AStarResult{
+			solution: solution,
+			err:      err,
+		}
+	}()
+
+	select {
+	case res := <-ch:
+		if res.err != nil {
+			return nil, err
+		}
+
+		return res.solution, nil
+
+	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
 }

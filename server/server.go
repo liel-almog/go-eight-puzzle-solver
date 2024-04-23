@@ -5,31 +5,31 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 const addr = ":5000"
 
-var app *fiber.App
+var app *echo.Echo
 
 func Serve() {
-	app = fiber.New(fiber.Config{
-		ErrorHandler: errorHandler,
-	})
-	app.Use(recover.New())
+	app = echo.New()
+	app.HTTPErrorHandler = func(err error, c echo.Context) {}
+
+	app.Use(middleware.Recover())
 
 	setupRouter(app)
 
 	fmt.Println("Server strating on port", addr)
 
-	if err := app.Listen(addr); err != nil {
+	if err := app.Start(addr); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
 
 func Shutdown(ctx context.Context) error {
-	err := app.Shutdown()
+	err := app.Shutdown(ctx)
 
 	if err != nil {
 		return err

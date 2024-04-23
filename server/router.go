@@ -1,13 +1,15 @@
 package server
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/routes"
 )
 
-func setupRouter(app *fiber.App) {
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+func setupRouter(app *echo.Echo) {
+	app.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, echo.Map{
 			"message": "Hello World!",
 		})
 	})
