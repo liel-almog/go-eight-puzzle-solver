@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,7 +12,9 @@ import (
 
 type PuzzleController interface {
 	GeneratePuzzle(c *fiber.Ctx) error
-	Solve(c *fiber.Ctx) error
+	BfsSolve(c *fiber.Ctx) error
+	DfsSolve(c *fiber.Ctx) error
+	AStarSolve(c *fiber.Ctx) error
 }
 
 type puzzleControllerImpl struct {
@@ -56,7 +59,7 @@ func (p *puzzleControllerImpl) GeneratePuzzle(c *fiber.Ctx) error {
 	return c.JSON(tiles)
 }
 
-func (p *puzzleControllerImpl) Solve(c *fiber.Ctx) error {
+func (p *puzzleControllerImpl) BfsSolve(c *fiber.Ctx) error {
 	tiles := new(dto.TilesDTO)
 
 	if err := c.BodyParser(tiles); err != nil {
@@ -67,7 +70,46 @@ func (p *puzzleControllerImpl) Solve(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	solution, err := p.puzzleService.Solve(c.Context(), tiles.Tiles)
+	solution, err := p.puzzleService.BfsSolve(c.Context(), tiles.Tiles)
+	fmt.Println("Cont")
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(solution)
+}
+
+func (p *puzzleControllerImpl) DfsSolve(c *fiber.Ctx) error {
+	tiles := new(dto.TilesDTO)
+
+	if err := c.BodyParser(tiles); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(tiles); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	solution, err := p.puzzleService.DfsSolve(c.Context(), tiles.Tiles)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(solution)
+}
+
+func (p *puzzleControllerImpl) AStarSolve(c *fiber.Ctx) error {
+	tiles := new(dto.TilesDTO)
+
+	if err := c.BodyParser(tiles); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(tiles); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	solution, err := p.puzzleService.AStarSolve(c.Context(), tiles.Tiles)
 	if err != nil {
 		return err
 	}

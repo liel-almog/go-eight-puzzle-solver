@@ -10,5 +10,7 @@ func NewPuzzleRouter(router fiber.Router) {
 
 	controller := controllers.GetPuzzleController()
 	group.Post("/generate", controller.GeneratePuzzle)
-	group.Post("/bfs/solve", controller.Solve)
+	group.Post("/bfs/solve", controller.BfsSolve)
+	group.Post("/dfs/solve", controller.DfsSolve)
+	group.Post("/astar/solve", controller.AStarSolve)
 }
