@@ -1,78 +1,84 @@
 package algorithm
 
 import (
-	"math/rand"
+	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
 )
 
-func createRandomArray(size int) []int {
-	arr := make([]int, size)
+func arrayToString(a [][]int) string {
+	var builder strings.Builder
+	for i, row := range a {
+		if i > 0 {
+			builder.WriteString("|") // Use '|' as a row delimiter
+		}
 
-	arr[0] = int(BoardBlankValue)
+		for j, val := range row {
+			if j > 0 {
+				builder.WriteString(",") // Use ',' as a column delimiter
+			}
 
-	for i := 1; i < len(arr); i++ {
-		arr[i] = i
+			fmt.Fprintf(&builder, "%d", val)
+		}
 	}
 
-	rand.Shuffle(len(arr), func(i, j int) { arr[i], arr[j] = arr[j], arr[i] })
-
-	return arr
+	return builder.String()
 }
 
-func convertTo1D(arr [][]int) []int {
-	rowCount := len(arr)
-	columnCount := len(arr[0])
-	a := make([]int, rowCount*columnCount)
+func stringToArray(rowCount, columnCount int, s string) [][]int {
+	var tiles [][]int = make([][]int, rowCount)
 
 	for i := 0; i < rowCount; i++ {
+		tiles[i] = make([]int, columnCount)
+	}
+
+	rows := strings.Split(s, "|")
+	if len(rows) != rowCount {
+		panic("can not transform string to array")
+	}
+
+	for i := 0; i < rowCount; i++ {
+		row := strings.Split(rows[i], ",")
+		if len(row) != columnCount {
+			panic("can not transform string to array")
+		}
+
 		for j := 0; j < columnCount; j++ {
-			a[i*columnCount+j] = arr[i][j]
+			n, err := strconv.Atoi(row[j])
+			if err != nil {
+				panic("can not transform string to array")
+			}
+
+			tiles[i][j] = n
 		}
 	}
 
-	return a
+	return tiles
 }
 
-func isOdd(n int) bool {
-	return n%2 == 1
-}
-
-func isEven(n int) bool {
-	return n%2 == 0
-}
-
-func GenerateTargetBoard(rowCount, columnCount int) []int {
-	arr := make([]int, rowCount*columnCount)
-	arr[0] = BoardBlankValue
-
-	for i := 1; i < rowCount*columnCount; i++ {
-		arr[i] = i
+func reconstructPath(initialBoard board.Board, state string, stateMap map[string]string) board.TilesArray {
+	var sPath []string
+	for step := state; step != ""; step = stateMap[step] {
+		sPath = append(sPath, step)
 	}
 
-	return arr
-}
+	var path = make([][][]int, len(sPath))
 
-func getBlankTileIndex(b *Board) int {
-	return b.blankTilePosition.row*b.columnCount + b.blankTilePosition.column
-}
+	for i := 0; i < len(sPath); i++ {
+		rowCount := initialBoard.GetRowCount()
+		columnCount := initialBoard.GetColumnCount()
+		t := stringToArray(rowCount, columnCount, sPath[i])
 
-func cloneTiles(tiles Tiles) (Tiles, error) {
-	rowCount := len(tiles)
-
-	if rowCount < 1 {
-		return nil, ErrEmptyTiles
+		path[i] = t
 	}
 
-	columnCount := len(tiles[0])
-
-	newTiles := make(Tiles, rowCount)
-	for i := 0; i < rowCount; i++ {
-		newTiles[i] = make([]int, columnCount)
-		if len(tiles[i]) != columnCount {
-			return nil, ErrTilesNotSameSize
-		}
-
-		copy(newTiles[i], tiles[i])
+	// Perform an In-Place Array Reversal
+	// We swap the first with the last, the second with the second last, etc...
+	for i, j := 0, len(path)-1; i < j; i, j = i+1, j-1 {
+		path[i], path[j] = path[j], path[i]
 	}
 
-	return newTiles, nil
+	return path
 }

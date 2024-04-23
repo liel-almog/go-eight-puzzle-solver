@@ -5,12 +5,15 @@ import (
 	"sync"
 
 	"github.com/lielalmog/go-be-eight-puzzle-solver/algorithm"
+	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/models/dto"
 )
 
 type PuzzleService interface {
-	GeneratePuzzle(context.Context, *dto.BoardDimensionsDTO) (algorithm.Tiles, error)
-	Solve(context.Context, algorithm.Tiles) (algorithm.TilesArray, error)
+	GeneratePuzzle(context.Context, *dto.BoardDimensionsDTO) (board.Tiles, error)
+	BfsSolve(context.Context, board.Tiles) (board.TilesArray, error)
+	DfsSolve(context.Context, board.Tiles) (board.TilesArray, error)
+	AStarSolve(context.Context, board.Tiles) (board.TilesArray, error)
 }
 
 type puzzleServiceImpl struct{}
@@ -32,8 +35,12 @@ func GetPuzzleService() PuzzleService {
 	return puzzleService
 }
 
-func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto.BoardDimensionsDTO) (algorithm.Tiles, error) {
-	b, err := algorithm.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
+func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto.BoardDimensionsDTO) (board.Tiles, error) {
+	b, err := board.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
+
+	for !b.IsSolvable() {
+		b, err = board.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
+	}
 
 	if err != nil {
 		return nil, err
@@ -42,25 +49,24 @@ func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto
 	return b.GetTiles(), nil
 }
 
-func (p *puzzleServiceImpl) Solve(ctx context.Context, tiles algorithm.Tiles) (algorithm.TilesArray, error) {
+func (p *puzzleServiceImpl) BfsSolve(ctx context.Context, tiles board.Tiles) (board.TilesArray, error) {
 	type BfsResult struct {
-		solution algorithm.TilesArray
+		solution board.TilesArray
 		err      error
 	}
 
-	b, err := algorithm.NewBoardFromTiles(tiles)
+	b, err := board.NewBoardFromTiles(tiles)
 	if err != nil {
 		return nil, err
 	}
 
 	bSolver := algorithm.NewBfsSolver(b)
-	targetBoard := algorithm.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
+	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
 
 	ch := make(chan BfsResult)
 
 	go func() {
 		solution, err := bSolver.Solve(targetBoard)
-
 		ch <- BfsResult{
 			solution: solution,
 			err:      err,
@@ -71,6 +77,82 @@ func (p *puzzleServiceImpl) Solve(ctx context.Context, tiles algorithm.Tiles) (a
 	case res := <-ch:
 		if res.err != nil {
 			return nil, err
+		}
+
+		return res.solution, nil
+
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (p *puzzleServiceImpl) DfsSolve(ctx context.Context, tiles board.Tiles) (board.TilesArray, error) {
+	type DfsResult struct {
+		solution board.TilesArray
+		err      error
+	}
+
+	b, err := board.NewBoardFromTiles(tiles)
+	if err != nil {
+		return nil, err
+	}
+
+	dSolver := algorithm.NewDfsSolver(b)
+	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
+
+	ch := make(chan DfsResult)
+
+	go func() {
+		solution, err := dSolver.Solve(targetBoard)
+
+		ch <- DfsResult{
+			solution: solution,
+			err:      err,
+		}
+	}()
+
+	select {
+	case res := <-ch:
+		if res.err != nil {
+			return nil, res.err
+		}
+
+		return res.solution, nil
+
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (p *puzzleServiceImpl) AStarSolve(ctx context.Context, tiles board.Tiles) (board.TilesArray, error) {
+	type AStarResult struct {
+		solution board.TilesArray
+		err      error
+	}
+
+	b, err := board.NewBoardFromTiles(tiles)
+	if err != nil {
+		return nil, err
+	}
+
+	aStarSolver := algorithm.NewAStarSolver(b)
+	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
+
+	ch := make(chan AStarResult)
+
+	go func() {
+		solution, err := aStarSolver.Solve(targetBoard)
+
+		ch <- AStarResult{
+			solution: solution,
+			err:      err,
+		}
+	}()
+
+	select {
+	case res := <-ch:
+		if res.err != nil {
+			return nil, res.err
 		}
 
 		return res.solution, nil

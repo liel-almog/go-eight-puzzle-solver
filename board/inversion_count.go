@@ -1,4 +1,4 @@
-package algorithm
+package board
 
 // Merge function that counts inversions
 func invCountMerge(arr []int, temp []int, left, mid, right int) int {

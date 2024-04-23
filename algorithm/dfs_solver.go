@@ -2,22 +2,22 @@ package algorithm
 
 import (
 	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/queue"
+	"github.com/lielalmog/go-be-eight-puzzle-solver/stack"
 )
 
-type BfsSolver struct {
+type DfsSolver struct {
 	InitialBoard *board.Board
 }
 
-func NewBfsSolver(b *board.Board) Solver {
-	return &BfsSolver{
+func NewDfsSolver(b *board.Board) Solver {
+	return &DfsSolver{
 		InitialBoard: b,
 	}
 }
 
-func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
-	q := queue.NewSliceQueue[board.Board]()
-	q.Enqueue(*bSolver.InitialBoard)
+func (dSolver *DfsSolver) Solve(targetBoard []int) (board.TilesArray, error) {
+	s := stack.NewSliceStack[board.Board]()
+	s.Push(*dSolver.InitialBoard)
 
 	var visited = make(map[string]bool)
 
@@ -25,14 +25,14 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 	// The value is a string representation of the board be
 	var parent = make(map[string]string)
 
-	initialBoardKey := arrayToString(bSolver.InitialBoard.GetTiles())
+	initialBoardKey := arrayToString(dSolver.InitialBoard.GetTiles())
 	parent[initialBoardKey] = ""
 
 	var iterations int
 
-	for !q.IsEmpty() {
+	for !s.IsEmpty() {
 		iterations++
-		b, err := q.Dequeue()
+		b, err := s.Pop()
 
 		// Set this board as visited
 		key := arrayToString(b.GetTiles())
@@ -52,12 +52,12 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 
 			if currBoard.IsSolved(targetBoard) {
 				parent[currBoardKey] = key
-				path := reconstructPath(*bSolver.InitialBoard, currBoardKey, parent)
+				path := reconstructPath(*dSolver.InitialBoard, currBoardKey, parent)
 				return path, nil
 			}
 
 			if _, found := visited[currBoardKey]; !found {
-				q.Enqueue(currBoard)
+				s.Push(currBoard)
 				parent[currBoardKey] = key
 			}
 		}

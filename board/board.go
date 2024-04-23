@@ -1,8 +1,11 @@
-package algorithm
+package board
 
 import (
 	"github.com/lielalmog/go-be-eight-puzzle-solver/errors/apperrors"
 )
+
+type Tiles = [][]int
+type TilesArray = []Tiles
 
 type Board struct {
 	rowCount          int
@@ -178,6 +181,26 @@ func (b *Board) move(move MoveDirection) error {
 	b.blankTilePosition = newPos
 
 	return nil
+}
+
+func (b *Board) Neighbours() ([]Board, error) {
+	var adj []Board = make([]Board, 0, 4)
+
+	directions := GetDirections()
+	for i := 0; i < len(directions); i++ {
+		d := directions[i]
+
+		newBoard, err := NewBoardFromBoard(b)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := newBoard.move(d); err == nil {
+			adj = append(adj, *newBoard)
+		}
+	}
+
+	return adj, nil
 }
 
 func (b *Board) GetTiles() Tiles {

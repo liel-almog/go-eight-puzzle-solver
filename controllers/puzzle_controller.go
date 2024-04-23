@@ -1,17 +1,20 @@
 package controllers
 
 import (
+	"net/http"
 	"sync"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/configs"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/models/dto"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/services"
 )
 
 type PuzzleController interface {
-	GeneratePuzzle(c *fiber.Ctx) error
-	Solve(c *fiber.Ctx) error
+	GeneratePuzzle(c echo.Context) error
+	BfsSolve(c echo.Context) error
+	DfsSolve(c echo.Context) error
+	AStarSolve(c echo.Context) error
 }
 
 type puzzleControllerImpl struct {
@@ -37,40 +40,78 @@ func GetPuzzleController() PuzzleController {
 	return puzzleController
 }
 
-func (p *puzzleControllerImpl) GeneratePuzzle(c *fiber.Ctx) error {
+func (p *puzzleControllerImpl) GeneratePuzzle(c echo.Context) error {
 	bDimensions := new(dto.BoardDimensionsDTO)
 
-	if err := c.BodyParser(bDimensions); err != nil {
-		return fiber.ErrBadRequest
+	if err := c.Bind(bDimensions); err != nil {
+		return echo.ErrBadRequest
 	}
 
 	if err := configs.GetValidator().Struct(bDimensions); err != nil {
-		return fiber.ErrBadRequest
+		return echo.ErrBadRequest
 	}
 
-	tiles, err := p.puzzleService.GeneratePuzzle(c.Context(), bDimensions)
+	tiles, err := p.puzzleService.GeneratePuzzle(c.Request().Context(), bDimensions)
 	if err != nil {
-		return fiber.ErrInternalServerError
+		return echo.ErrInternalServerError
 	}
 
-	return c.JSON(tiles)
+	return c.JSON(http.StatusOK, tiles)
 }
 
-func (p *puzzleControllerImpl) Solve(c *fiber.Ctx) error {
+func (p *puzzleControllerImpl) BfsSolve(c echo.Context) error {
 	tiles := new(dto.TilesDTO)
 
-	if err := c.BodyParser(tiles); err != nil {
-		return fiber.ErrBadRequest
+	if err := c.Bind(tiles); err != nil {
+		return echo.ErrBadRequest
 	}
 
 	if err := configs.GetValidator().Struct(tiles); err != nil {
-		return fiber.ErrBadRequest
+		return echo.ErrBadRequest
 	}
 
-	solution, err := p.puzzleService.Solve(c.Context(), tiles.Tiles)
+	solution, err := p.puzzleService.BfsSolve(c.Request().Context(), tiles.Tiles)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(solution)
+	return c.JSON(http.StatusOK, solution)
+}
+
+func (p *puzzleControllerImpl) DfsSolve(c echo.Context) error {
+	tiles := new(dto.TilesDTO)
+
+	if err := c.Bind(tiles); err != nil {
+		return echo.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(tiles); err != nil {
+		return echo.ErrBadRequest
+	}
+
+	solution, err := p.puzzleService.DfsSolve(c.Request().Context(), tiles.Tiles)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, solution)
+}
+
+func (p *puzzleControllerImpl) AStarSolve(c echo.Context) error {
+	tiles := new(dto.TilesDTO)
+
+	if err := c.Bind(tiles); err != nil {
+		return echo.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(tiles); err != nil {
+		return echo.ErrBadRequest
+	}
+
+	solution, err := p.puzzleService.AStarSolve(c.Request().Context(), tiles.Tiles)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, solution)
 }
