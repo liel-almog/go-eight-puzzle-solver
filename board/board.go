@@ -1,8 +1,11 @@
-package algorithm
+package board
 
 import (
 	"github.com/lielalmog/go-be-eight-puzzle-solver/errors/apperrors"
 )
+
+type Tiles = [][]int
+type TilesArray = []Tiles
 
 type Board struct {
 	rowCount          int
@@ -160,7 +163,7 @@ func (b *Board) isOutOfBounds(pos Position) bool {
 	return (pos.column < 0 || pos.column >= b.columnCount) || (pos.row < 0 || pos.row >= b.rowCount)
 }
 
-func (b *Board) move(move MoveDirection) error {
+func (b *Board) Move(move MoveDirection) error {
 	newPos := Position{
 		row:    b.blankTilePosition.row + move.rowChange,
 		column: b.blankTilePosition.column + move.columnChange,

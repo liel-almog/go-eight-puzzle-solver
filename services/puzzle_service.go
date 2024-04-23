@@ -5,12 +5,13 @@ import (
 	"sync"
 
 	"github.com/lielalmog/go-be-eight-puzzle-solver/algorithm"
+	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/models/dto"
 )
 
 type PuzzleService interface {
-	GeneratePuzzle(context.Context, *dto.BoardDimensionsDTO) (algorithm.Tiles, error)
-	Solve(context.Context, algorithm.Tiles) (algorithm.TilesArray, error)
+	GeneratePuzzle(context.Context, *dto.BoardDimensionsDTO) (board.Tiles, error)
+	Solve(context.Context, board.Tiles) (board.TilesArray, error)
 }
 
 type puzzleServiceImpl struct{}
@@ -32,8 +33,8 @@ func GetPuzzleService() PuzzleService {
 	return puzzleService
 }
 
-func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto.BoardDimensionsDTO) (algorithm.Tiles, error) {
-	b, err := algorithm.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
+func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto.BoardDimensionsDTO) (board.Tiles, error) {
+	b, err := board.NewBoard(bDimensions.RowCount, bDimensions.ColumnCount)
 
 	if err != nil {
 		return nil, err
@@ -42,19 +43,19 @@ func (p *puzzleServiceImpl) GeneratePuzzle(ctx context.Context, bDimensions *dto
 	return b.GetTiles(), nil
 }
 
-func (p *puzzleServiceImpl) Solve(ctx context.Context, tiles algorithm.Tiles) (algorithm.TilesArray, error) {
+func (p *puzzleServiceImpl) Solve(ctx context.Context, tiles board.Tiles) (board.TilesArray, error) {
 	type BfsResult struct {
-		solution algorithm.TilesArray
+		solution board.TilesArray
 		err      error
 	}
 
-	b, err := algorithm.NewBoardFromTiles(tiles)
+	b, err := board.NewBoardFromTiles(tiles)
 	if err != nil {
 		return nil, err
 	}
 
 	bSolver := algorithm.NewBfsSolver(b)
-	targetBoard := algorithm.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
+	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
 
 	ch := make(chan BfsResult)
 

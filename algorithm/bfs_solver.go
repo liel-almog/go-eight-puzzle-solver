@@ -5,21 +5,22 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
 	"github.com/lielalmog/go-be-eight-puzzle-solver/queue"
 )
 
 type BfsSolver struct {
-	InitialBoard *Board
+	InitialBoard *board.Board
 }
 
-func NewBfsSolver(b *Board) Solver {
+func NewBfsSolver(b *board.Board) Solver {
 	return &BfsSolver{
 		InitialBoard: b,
 	}
 }
 
 func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
-	q := queue.NewSliceQueue[Board]()
+	q := queue.NewSliceQueue[board.Board]()
 	q.Enqueue(*bSolver.InitialBoard)
 
 	var visited = make(map[string]bool)
@@ -28,7 +29,7 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 	// The value is a string representation of the board be
 	var parent = make(map[string]string)
 
-	initialBoardKey := bSolver.arrayToString(bSolver.InitialBoard.tiles)
+	initialBoardKey := bSolver.arrayToString(bSolver.InitialBoard.GetTiles())
 	parent[initialBoardKey] = ""
 
 	var iterations int
@@ -38,7 +39,7 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 		b, err := q.Dequeue()
 
 		// Set this board as visited
-		key := bSolver.arrayToString(b.tiles)
+		key := bSolver.arrayToString(b.GetTiles())
 		visited[key] = true
 
 		if err != nil {
@@ -51,7 +52,7 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 		}
 
 		for _, currBoard := range n {
-			currBoardKey := bSolver.arrayToString(currBoard.tiles)
+			currBoardKey := bSolver.arrayToString(currBoard.GetTiles())
 
 			if currBoard.IsSolved(targetBoard) {
 				parent[currBoardKey] = key
@@ -69,19 +70,19 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 	return nil, ErrNoSolution
 }
 
-func (bSolver *BfsSolver) neighbours(b *Board) ([]Board, error) {
-	var adj []Board = make([]Board, 0, 4)
+func (bSolver *BfsSolver) neighbours(b *board.Board) ([]board.Board, error) {
+	var adj []board.Board = make([]board.Board, 0, 4)
 
-	directions := GetDirections()
+	directions := board.GetDirections()
 	for i := 0; i < len(directions); i++ {
 		d := directions[i]
 
-		newBoard, err := NewBoardFromBoard(b)
+		newBoard, err := board.NewBoardFromBoard(b)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := newBoard.move(d); err == nil {
+		if err := newBoard.Move(d); err == nil {
 			adj = append(adj, *newBoard)
 		}
 	}
@@ -132,8 +133,8 @@ func (bSolver *BfsSolver) arrayToString(a [][]int) string {
 }
 
 func (bSolver *BfsSolver) stringToArray(s string) [][]int {
-	rowCount := bSolver.InitialBoard.rowCount
-	columnCount := bSolver.InitialBoard.columnCount
+	rowCount := bSolver.InitialBoard.GetRowCount()
+	columnCount := bSolver.InitialBoard.GetColumnCount()
 
 	var tiles [][]int = make([][]int, rowCount)
 

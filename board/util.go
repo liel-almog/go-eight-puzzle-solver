@@ -1,4 +1,4 @@
-package algorithm
+package board
 
 import (
 	"math/rand"

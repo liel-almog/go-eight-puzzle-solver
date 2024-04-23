@@ -1,4 +1,4 @@
-package algorithm
+package board
 
 type Position struct {
 	row    int

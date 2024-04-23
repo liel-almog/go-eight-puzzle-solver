@@ -1,4 +1,4 @@
-package algorithm
+package board
 
 type MoveDirection struct {
 	rowChange    int
