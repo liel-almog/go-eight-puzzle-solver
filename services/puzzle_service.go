@@ -97,13 +97,13 @@ func (p *puzzleServiceImpl) DfsSolve(ctx context.Context, tiles board.Tiles) (bo
 		return nil, err
 	}
 
-	bSolver := algorithm.NewBfsSolver(b)
+	dSolver := algorithm.NewDfsSolver(b)
 	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
 
 	ch := make(chan DfsResult)
 
 	go func() {
-		solution, err := bSolver.Solve(targetBoard)
+		solution, err := dSolver.Solve(targetBoard)
 
 		ch <- DfsResult{
 			solution: solution,
@@ -114,7 +114,7 @@ func (p *puzzleServiceImpl) DfsSolve(ctx context.Context, tiles board.Tiles) (bo
 	select {
 	case res := <-ch:
 		if res.err != nil {
-			return nil, err
+			return nil, res.err
 		}
 
 		return res.solution, nil
@@ -135,13 +135,13 @@ func (p *puzzleServiceImpl) AStarSolve(ctx context.Context, tiles board.Tiles) (
 		return nil, err
 	}
 
-	bSolver := algorithm.NewBfsSolver(b)
+	aStarSolver := algorithm.NewAStarSolver(b)
 	targetBoard := board.GenerateTargetBoard(b.GetRowCount(), b.GetColumnCount())
 
 	ch := make(chan AStarResult)
 
 	go func() {
-		solution, err := bSolver.Solve(targetBoard)
+		solution, err := aStarSolver.Solve(targetBoard)
 
 		ch <- AStarResult{
 			solution: solution,
@@ -152,7 +152,7 @@ func (p *puzzleServiceImpl) AStarSolve(ctx context.Context, tiles board.Tiles) (
 	select {
 	case res := <-ch:
 		if res.err != nil {
-			return nil, err
+			return nil, res.err
 		}
 
 		return res.solution, nil
