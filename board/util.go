@@ -25,7 +25,8 @@ func convertTo1D(arr [][]int) []int {
 
 	for i := 0; i < rowCount; i++ {
 		for j := 0; j < columnCount; j++ {
-			a[i*columnCount+j] = arr[i][j]
+			index := IndexConversion(columnCount, i, j)
+			a[index] = arr[i][j]
 		}
 	}
 
@@ -51,8 +52,9 @@ func GenerateTargetBoard(rowCount, columnCount int) []int {
 	return arr
 }
 
-func getBlankTileIndex(b *Board) int {
-	return b.blankTilePosition.row*b.columnCount + b.blankTilePosition.column
+// Convert an index from a two dimentional array to an index of a one dimentional array
+func IndexConversion(columnCount, rowIndex, countIndex int) int {
+	return rowIndex*columnCount + countIndex
 }
 
 func cloneTiles(tiles Tiles) (Tiles, error) {

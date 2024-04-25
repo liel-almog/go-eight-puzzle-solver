@@ -120,8 +120,7 @@ func (b *Board) IsValid() bool {
 func (b *Board) inversionCount() int {
 	arr := convertTo1D(b.tiles)
 
-	// Remove the blank tile
-	index := getBlankTileIndex(b)
+	index := IndexConversion(b.columnCount, b.blankTilePosition.row, b.blankTilePosition.column)
 	arr = append(arr[:index], arr[index+1:]...)
 
 	return countInversions(arr)
@@ -144,15 +143,18 @@ func (b *Board) IsSolvable() bool {
 }
 
 func (b *Board) IsSolved(targetArr []int) bool {
-	currArr := convertTo1D(b.tiles)
+	// currArr := convertTo1D(b.tiles)
 
-	if len(currArr) != len(targetArr) {
+	if b.columnCount*b.rowCount != len(targetArr) {
 		return false
 	}
 
-	for i := 0; i < len(currArr); i++ {
-		if currArr[i] != targetArr[i] {
-			return false
+	for i := 0; i < b.rowCount; i++ {
+		for j := 0; j < b.columnCount; j++ {
+			index := IndexConversion(b.columnCount, i, j)
+			if b.tiles[i][j] != targetArr[index] {
+				return false
+			}
 		}
 	}
 
