@@ -33,14 +33,13 @@ func (bSolver *BfsSolver) Solve(targetBoard []int) ([][][]int, error) {
 	for !q.IsEmpty() {
 		iterations++
 		b, err := q.Dequeue()
+		if err != nil {
+			return nil, err
+		}
 
 		// Set this board as visited
 		key := arrayToString(b.GetTiles())
 		visited[key] = true
-
-		if err != nil {
-			return nil, err
-		}
 
 		n, err := b.Neighbours()
 		if err != nil {

@@ -33,14 +33,13 @@ func (dSolver *DfsSolver) Solve(targetBoard []int) (board.TilesArray, error) {
 	for !s.IsEmpty() {
 		iterations++
 		b, err := s.Pop()
+		if err != nil {
+			return nil, err
+		}
 
 		// Set this board as visited
 		key := arrayToString(b.GetTiles())
 		visited[key] = true
-
-		if err != nil {
-			return nil, err
-		}
 
 		n, err := b.Neighbours()
 		if err != nil {
