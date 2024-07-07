@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/controllers"
+	"github.com/lielalmog/go-eight-puzzle-solver/controllers"
 )
 
 func NewPuzzleRouter(router *echo.Group) {

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/routes"
+	"github.com/lielalmog/go-eight-puzzle-solver/routes"
 )
 
 func setupRouter(app *echo.Echo) {

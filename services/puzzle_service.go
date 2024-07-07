@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/lielalmog/go-be-eight-puzzle-solver/algorithm"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/models/dto"
+	"github.com/lielalmog/go-eight-puzzle-solver/algorithm"
+	"github.com/lielalmog/go-eight-puzzle-solver/board"
+	"github.com/lielalmog/go-eight-puzzle-solver/models/dto"
 )
 
 type PuzzleService interface {

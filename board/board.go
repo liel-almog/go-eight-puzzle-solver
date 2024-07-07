@@ -1,7 +1,7 @@
 package board
 
 import (
-	"github.com/lielalmog/go-be-eight-puzzle-solver/errors/apperrors"
+	"github.com/lielalmog/go-eight-puzzle-solver/errors/apperrors"
 )
 
 type Tiles = [][]int

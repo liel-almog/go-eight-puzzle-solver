@@ -1,8 +1,8 @@
 package algorithm
 
 import (
-	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/queue"
+	"github.com/lielalmog/go-eight-puzzle-solver/board"
+	"github.com/lielalmog/go-eight-puzzle-solver/queue"
 )
 
 type BfsSolver struct {

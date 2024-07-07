@@ -3,8 +3,8 @@ package algorithm
 import (
 	"math"
 
-	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/heap"
+	"github.com/lielalmog/go-eight-puzzle-solver/board"
+	"github.com/lielalmog/go-eight-puzzle-solver/heap"
 )
 
 type AStarSolver struct {

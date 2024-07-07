@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lielalmog/go-be-eight-puzzle-solver/board"
+	"github.com/lielalmog/go-eight-puzzle-solver/board"
 )
 
 func arrayToString(a [][]int) string {

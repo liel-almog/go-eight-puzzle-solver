@@ -5,9 +5,9 @@ import (
 	"sync"
 
 	"github.com/labstack/echo/v4"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/configs"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/models/dto"
-	"github.com/lielalmog/go-be-eight-puzzle-solver/services"
+	"github.com/lielalmog/go-eight-puzzle-solver/configs"
+	"github.com/lielalmog/go-eight-puzzle-solver/models/dto"
+	"github.com/lielalmog/go-eight-puzzle-solver/services"
 )
 
 type PuzzleController interface {

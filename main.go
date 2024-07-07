@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lielalmog/go-be-eight-puzzle-solver/server"
+	"github.com/lielalmog/go-eight-puzzle-solver/server"
 )
 
 func main() {

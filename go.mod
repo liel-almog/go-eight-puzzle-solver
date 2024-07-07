@@ -1,4 +1,4 @@
-module github.com/lielalmog/go-be-eight-puzzle-solver
+module github.com/lielalmog/go-eight-puzzle-solver
 
 go 1.22.2
 
