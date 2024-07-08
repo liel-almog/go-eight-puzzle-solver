@@ -1,0 +1,91 @@
+@use "../../theme/theme" as *;
+
+.container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  .instructions {
+    padding: 1rem;
+    text-align: right;
+    direction: rtl;
+    p {
+      color: $blue-darker;
+      font-size: large;
+    }
+  }
+
+  .getStarted {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+
+    .controls {
+      padding-top: 2rem;
+      display: flex;
+      gap: 2rem;
+    }
+
+    button {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      outline: none;
+      border: 0;
+      vertical-align: middle;
+      text-decoration: none;
+      font-size: inherit;
+      font-family: inherit;
+      &.btn {
+        font-weight: 600;
+        color: $blue-dark;
+        text-transform: uppercase;
+        padding: 0.75rem 1.5rem;
+        background: $blue-lighter;
+        border: 2px solid $blue;
+        border-radius: 0.75rem;
+        transform-style: preserve-3d;
+        transition: transform 225ms cubic-bezier(0, 0, 0.58, 1),
+          background 225ms cubic-bezier(0, 0, 0.58, 1);
+        &::before {
+          position: absolute;
+          content: "";
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: $blue;
+          border-radius: inherit;
+          box-shadow: 0 0 0 2px $blue, 0 0.625rem 0 0 $blue-light;
+          transform: translate3d(0, 0.75rem, -1rem);
+          transition: transform 225ms cubic-bezier(0, 0, 0.58, 1),
+            box-shadow 225ms cubic-bezier(0, 0, 0.58, 1);
+        }
+        &:hover {
+          background: $blue-light;
+          transform: translate(0, 0.25rem);
+          &::before {
+            box-shadow: 0 0 0 2px $blue, 0 0.5rem 0 0 $blue-light;
+            transform: translate3d(0, 0.5rem, -1rem);
+          }
+        }
+        &:active {
+          background: $blue;
+          color: $blue-white;
+          transform: translate(0rem, 0.75rem);
+          &::before {
+            box-shadow: 0 0 0 2px $blue, 0 0 $blue-white;
+            transform: translate3d(0, 0, -1rem);
+          }
+        }
+      }
+    }
+  }
+}

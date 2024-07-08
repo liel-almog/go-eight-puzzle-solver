@@ -1,0 +1,16 @@
+@use "../../../theme/theme" as *;
+
+.cell {
+  height: 5rem;
+  width: 5rem;
+  background-color: white;
+  color: darken($color: $blue, $amount: 10);
+  font-size: 3rem;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 -1px -1px 0;
+  user-select: none;
+  border-radius: 0.3rem;
+}

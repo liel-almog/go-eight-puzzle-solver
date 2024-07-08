@@ -1,0 +1,32 @@
+.container {
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    color: rgb(195, 95, 95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    & > svg {
+        font-size: 2rem;
+    }
+    & > .btn {
+        &:hover {
+            border-color: black;
+        }
+    }
+
+    :global {
+        .ant-collapse {
+            max-width: 90vw;
+            max-height: 30vh;
+        }
+
+        .ant-collapse-content {
+            max-height: 25vh;
+            overflow-y: scroll;
+        }
+    }
+}

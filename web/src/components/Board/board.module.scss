@@ -1,0 +1,19 @@
+@use "../../theme/theme" as *;
+
+$gap: 0.5rem;
+
+.board {
+  background-color: $blue;
+  width: min-content;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+  border-radius: 0.3rem;
+  font-weight: bolder;
+
+  .row {
+    display: flex;
+    gap: $gap;
+  }
+}
