@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { puzzleKeys } from "./puzzle.keys";
-import { PuzzleService } from "../../services/puzzle.service";
+import { Algorithms, PuzzleService } from "../../services/puzzle.service";
 import { BoardDimensions, Tiles } from "../../models/tiles.model";
 
 export const usePuzzleGenerator = (boardDimensions: BoardDimensions) => {
@@ -12,11 +12,12 @@ export const usePuzzleGenerator = (boardDimensions: BoardDimensions) => {
   });
 };
 
-export const usePuzzleSolver = (tiles: Tiles) => {
-  return useQuery({
-    queryKey: puzzleKeys.solve(tiles),
-    queryFn: ({ signal }) => PuzzleService.bfsSolve(tiles, signal),
+export const usePuzzleSolver = (tiles: Tiles, algorithm: Algorithms, options?: Omit<UseQueryOptions<Tiles[]>, 'queryKey'>) => {
+  return useQuery<Tiles[]>({
+    queryKey: puzzleKeys.solve(tiles, algorithm),
+    queryFn: ({ signal }) => PuzzleService.solve(tiles, algorithm, signal),
     staleTime: Infinity,
     throwOnError: true,
+    ...options
   });
 };

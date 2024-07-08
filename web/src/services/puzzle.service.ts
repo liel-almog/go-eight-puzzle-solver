@@ -2,6 +2,9 @@ import { apiInstance } from ".";
 import { BoardDimensions, Tiles, solutionStepsSchema, tilesSchema } from "../models/tiles.model";
 
 const PREFIX = "puzzle" as const;
+export const algorithms = ['BFS', 'DFS', 'ASTAR'] as const
+export type Algorithms = typeof algorithms[number]
+
 
 export class PuzzleService {
   static async generatePuzzle(generateBoardDimensions: BoardDimensions) {
@@ -14,10 +17,10 @@ export class PuzzleService {
     }
   }
 
-  static async bfsSolve(tiles: Tiles, signal: AbortSignal) {
+  static async solve(tiles: Tiles, algorithm: Algorithms, signal: AbortSignal) {
     try {
       const response = await apiInstance.post(
-        `/${PREFIX}/bfs/solve`,
+        `/${PREFIX}/${algorithm.toLocaleLowerCase()}/solve`,
         { tiles },
         {
           signal,
@@ -29,4 +32,5 @@ export class PuzzleService {
       throw new Error("לא ניתן לפתור את הפאזל");
     }
   }
+
 }
