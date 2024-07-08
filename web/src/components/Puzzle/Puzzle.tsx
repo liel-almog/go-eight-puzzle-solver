@@ -6,8 +6,10 @@ import { PuzzleSolver } from "./PuzzleSolver";
 import { UnsolvedPuzzle } from "./UnsolvedPuzzle";
 import classes from "./puzzle.module.scss";
 import { usePuzzle } from "./usePuzzle";
+import { Algorithms } from "../../services/puzzle.service";
+import { usePuzzleSolver } from "./queries";
 
-export interface PuzzleProps {}
+export interface PuzzleProps { }
 
 export interface SolveButtonProps {
   tiles: Tiles;
@@ -16,6 +18,8 @@ export interface SolveButtonProps {
 
 export const Puzzle = () => {
   const [isAutoSolving, setIsAutoSolving] = useState(false);
+  const [algorithm, setAlgorithm] = useState<Algorithms>('BFS')
+
   const {
     reducer: { dispatch, tiles },
     boardDimensions: { setBoardDimensions, boardDimensions },
@@ -32,6 +36,11 @@ export const Puzzle = () => {
     });
   };
 
+  const { data, isSuccess: solverIsSuccess, status } = usePuzzleSolver(tiles, algorithm, {
+    enabled: false
+  });
+
+
   if (isSuccess) {
     return (
       <main className={classes.board}>
@@ -41,13 +50,17 @@ export const Puzzle = () => {
           isAutoSolving={isAutoSolving}
         />
         {isAutoSolving ? (
-          <PuzzleSolver tiles={tiles} setIsAutoSolving={setIsAutoSolving} />
+          <PuzzleSolver tiles={tiles} setIsAutoSolving={setIsAutoSolving} algorithm={algorithm} query={{
+            data, isSuccess: solverIsSuccess, status
+          }} />
         ) : (
           <UnsolvedPuzzle
             boardDimensions={boardDimensions}
             handleMove={handleMove}
             setIsAutoSolving={setIsAutoSolving}
             tiles={tiles}
+            algorithm={algorithm}
+            setAlgorithm={setAlgorithm}
           />
         )}
       </main>
