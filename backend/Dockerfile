@@ -22,7 +22,6 @@ WORKDIR /app
 
 # Copy only the compiled binary from the build stage
 COPY --from=builder /app/main /app/main
-COPY --from=builder /app/.env /app/.env
 
 # Expose the application port
 EXPOSE 5000
